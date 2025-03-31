@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>人机验证 - captcha.html</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: #f5f5f5;
+        }
+        .captcha-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        #captchaDisplay {
+            font-size: 2rem;
+            letter-spacing: 0.5rem;
+            margin: 1.5rem 0;
+            padding: 0.5rem;
+            background: #e8e8e8;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+        }
+        input[type="text"] {
+            padding: 0.8rem;
+            margin: 1rem 0;
+            width: 200px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        button {
+            background: #17a2b8;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #138496;
+        }
+        #errorMsg {
+            color: #dc3545;
+            margin-top: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="captcha-container">
+        <h2>请验证您是人类</h2>
+        <div id="captchaDisplay"></div>
+        <input type="text" 
+               id="captchaInput" 
+               placeholder="输入上方验证码"
+               autocomplete="off">
+        <button onclick="validateCaptcha()">提交验证</button>
+        <p id="errorMsg">验证码错误，请重试！</p>
+    </div>
+
+    <script>
+        // 生成防混淆验证码（排除0/O、1/I/L等）
+        const generateCaptcha = () => {
+            const safeChars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+            let captcha = "";
+            for(let i = 0; i < 4; i++) {
+                captcha += safeChars[Math.floor(Math.random() * safeChars.length)];
+            }
+            return captcha;
+        };
+
+        // 初始化验证码
+        let currentCaptcha = generateCaptcha();
+        document.getElementById('captchaDisplay').textContent = currentCaptcha;
+
+        // 验证逻辑
+        const validateCaptcha = () => {
+            const userInput = document.getElementById('captchaInput').value.toUpperCase();
+            const errorMsg = document.getElementById('errorMsg');
+
+            if(userInput === currentCaptcha) {
+                window.location.href = 'success.html';
+            } else {
+                errorMsg.style.display = 'block';
+                currentCaptcha = generateCaptcha();  // 刷新验证码
+                document.getElementById('captchaDisplay').textContent = currentCaptcha;
+                document.getElementById('captchaInput').value = '';  // 清空输入框
+                document.getElementById('captchaInput').focus();    // 自动聚焦
+            }
+        };
+
+        // 回车键支持
+        document.getElementById('captchaInput').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') {
+                validateCaptcha();
+            }
+        });
+    </script>
+</body>
+</html>
